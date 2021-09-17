@@ -10,6 +10,7 @@ routes.delete('/api/wishlists', WishlistController.deleteOne)
 routes.put('/api/wishlists', WishlistController.updateOne)
 
 routes.post('/api/user', UserController.create)
+routes.post('/api/login', UserController.authenticate)
 routes.get('/api/user', UserController.find)
 
 export default routes

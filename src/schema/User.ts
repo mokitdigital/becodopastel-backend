@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Error } from "mongoose";
 import bcrypt from "bcrypt";
 
 interface UserInterface extends Document {
@@ -43,21 +43,22 @@ const UserSchema = new Schema({
   }
 );
 
-UserSchema.pre<IAuthDocument>('save', function (next) {
-  const user = this
+UserSchema.pre<IAuthDocument>("save", function save(next) {
+  const user = this;
 
-  if (!user.isModified('password')) {
-    return next()
-  }
+  if (!user.isModified("password")) { return next(); }
 
-  bcrypt.genSalt((_err: Error, salt: string) => {
-    if (typeof user.password !== 'undefined') {
-      bcrypt.hash(user.password, salt, (_err: Error, hash: string) => {
-        user.password = hash
-        next()
-      })
-    }
-  })
-})
+  bcrypt.genSalt(10, (err, salt) => {
+      if (err) { return next(err); }
+
+      if (typeof user.password !== 'undefined') {
+        bcrypt.hash(user.password, salt).then(response => {
+            if (err) { return next(err); }
+            user.password = response;
+            next();
+        });
+      }
+  });
+});
 
 export default model<UserInterface>('User', UserSchema);

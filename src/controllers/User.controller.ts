@@ -5,9 +5,8 @@ import jwt from 'jsonwebtoken'
 
 class UserController {
   public async find (req: Request, res: Response): Promise<Response> {
-    const { id } = req.query
-
-    if (id === undefined) {
+    const { token } = req.query
+    if (token === undefined) {
       const user = await User.find()
 
       if (user === undefined) {
@@ -23,7 +22,9 @@ class UserController {
 
       return res.status(200).json(user)
     } else {
-      const user = await User.findById({ _id: id })
+      const user = await User.findOne({
+        token: token
+      })
 
       if (user === undefined) {
         try {
@@ -41,18 +42,8 @@ class UserController {
   }
   
   public async create (req: Request, res: Response): Promise<Response> {
+    
     const user = await User.create(req.body)
-
-    if (user === undefined) {
-      try {
-        throw new Error('Payload vazio')
-      } catch (e) {
-        console.log(e)
-        return res.status(400).json({
-          message: 'Nenhum payload correspondente ao usuário'
-        })
-      }
-    }
 
     return res.status(201).json({
       message: 'Usuário criado com sucesso!',
