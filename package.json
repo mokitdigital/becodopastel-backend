@@ -16,6 +16,7 @@
     "@babel/register": "^7.13.16",
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^8.5.1",
+    "axios": "^0.21.4",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

@@ -8,14 +8,11 @@ const isTokenExpired = (token: string): boolean => {
       const { exp } = jwt.decode(token) as {
           exp: number;
       };
-      const expirationDatetimeInSeconds = exp * 1000;
-      
-      console.log("Está expirado? ", expirationDatetimeInSeconds)
-      console.log("Date: ", Date.now())
+      const expirationDatetimeInSeconds = exp;
 
-      return Date.now() >= expirationDatetimeInSeconds;
+      return Date.now() >= expirationDatetimeInSeconds
   } catch {
-      return true;
+      return true
   }
 };
 
@@ -23,7 +20,8 @@ class UserController {
   public async findToken(req: Request, res: Response): Promise<Response> {
     const token: string = req.query.token as string
 
-    if (isTokenExpired(token)) {
+
+    if (!isTokenExpired(token)) {
       return res.status(200).json({
         isToken: false
       })
@@ -31,6 +29,45 @@ class UserController {
 
     return res.status(200).json({
       isToken: true
+    })
+  }
+
+  public async userPerfil(req: Request, res: Response): Promise<Response> {
+    const token: string = req.query.token as string
+
+    if (token === undefined) {
+      return res.status(500).json({
+        message: 'Nenhum usuário encontrado!'
+      })
+    }
+
+    const user = await User.findOne({
+      token: token
+    })
+
+    if (user === undefined || user === null) {
+      try {
+        throw new Error('Lista do banco de dados => ID nao correspondente')
+      } catch (e) {
+        return res.status(500).json({
+          message: 'Sessão inspirada! Faça um novo login!',
+          success: false
+        })
+      }
+    }
+
+    return res.status(200).json({
+      celular: user.celular,
+      cep: user.cep,
+      cidade: user.cidade,
+      complemento: user.complemento,
+      cpf: user.cpf,
+      dataNascimento: user.dataNascimento,
+      email: user.email,
+      endereco: user.endereco,
+      estado: user.estado,
+      nomeCompleto: user.nomeCompleto,
+      numero: user.numero,
     })
   }
   
@@ -44,7 +81,6 @@ class UserController {
         try {
           throw new Error('Lista do banco de dados => Usuário está vazia')
         } catch (e) {
-          console.log(e)
           return res.status(500).json({
             message: 'Nenhum dado correspondente ao usuário'
           })
@@ -61,7 +97,6 @@ class UserController {
         try {
           throw new Error('Lista do banco de dados => ID nao correspondente')
         } catch (e) {
-          console.log(e)
           return res.status(500).json({
             message: 'Nenhum usuário correspondente a lista'
           })
@@ -87,33 +122,32 @@ class UserController {
     const compare: string = req.body.password as string
     let token = null
 
-    const auth = await User.findOne({ email }, async function (err: Error, response: IAuthDocument) {
+    await User.findOne({ email }, async function (err: Error, response: IAuthDocument) {
       if (response && response.password) {
-        console.log(bcrypt.compareSync(compare, response.password))
         if (bcrypt.compareSync(compare, response.password)) {
           const id = response._id
           token = jwt.sign({ id }, 'ovo', {
-            expiresIn: 60 // expira em 1 dia
+            expiresIn: 7200000 // expira em 2 horas
           })
 
-          console.log("Nome token", token)
-
-          await User.updateOne({ email }, { token })
+          await User.updateOne({ email }, { token })        
         }
       }
     })
-
+    
     if (token) {
-      return res.status(200).json({
+      return res
+      .status(200)
+      .json({
         msg: "Autentificação bem sucedida!",
-        token
-      })
-    } else {
-      return res.status(500).json({
-        error: "Senha Inválida"
+        token,
+        success: true
       })
     }
 
+    return res.status(403).json({
+      error: "Senha Inválida"
+    })
   }
 }
 

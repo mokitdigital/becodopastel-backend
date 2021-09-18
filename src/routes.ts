@@ -13,5 +13,6 @@ routes.post('/api/user', UserController.create)
 routes.post('/api/login', UserController.authenticate)
 routes.get('/api/user', UserController.find)
 routes.get('/api/token', UserController.findToken)
+routes.get('/api/perfils', UserController.userPerfil)
 
 export default routes

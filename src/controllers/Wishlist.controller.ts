@@ -12,7 +12,6 @@ class WishlistController {
         try {
           throw new Error('Lista do banco de dados => Wishlist está vazia')
         } catch (e) {
-          console.log(e)
           return res.status(500).json({
             message: 'Nenhum dado correspondente ao wishlist'
           })
@@ -27,7 +26,6 @@ class WishlistController {
         try {
           throw new Error('Lista do banco de dados => ID nao correspondente')
         } catch (e) {
-          console.log(e)
           return res.status(500).json({
             message: 'Nenhum produto correspondente a lista'
           })
@@ -45,7 +43,6 @@ class WishlistController {
         try {
           throw new Error('Payload vazio')
         } catch (e) {
-          console.log(e)
           return res.status(400).json({
             message: 'Nenhum payload correspondente ao wishlist'
           })
@@ -65,7 +62,6 @@ class WishlistController {
       try {
         throw new Error('Payload vazio')
       } catch (e) {
-        console.log(e)
         return res.status(400).json({
           message: 'Nenhum payload correspondente ao wishlist'
         })
@@ -82,7 +78,6 @@ class WishlistController {
       try {
         throw new Error('Payload vazio ou não correspondente')
       } catch (e) {
-        console.log(e)
         return res.status(400).json({
           message: 'Nenhum payload correspondente ao wishlist'
         })
